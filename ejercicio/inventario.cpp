@@ -8,9 +8,6 @@ struct Producto
     int cantidadenStock;
 };
 
-const int productosMaximos=100;
-Producto producto[productosMaximos];
-int totalProductos=0;
 
 void llenarProductos(Producto producto[], int n){
     for (int i = 0; i < n; i++)
@@ -36,10 +33,10 @@ int buscarProducto(Producto producto[], int n, int codigo ){
         if (producto[i].codigo==codigo)
         {
             cout<<"producto encontrado"<<endl;
-            cout<<"codigo"<<producto[i].codigo<<endl;
-            cout<<"nombre"<<producto[i].nombre<<endl;
-            cout<<"precio"<<producto[i].precio<<endl;
-            cout<<"cantidad en stock"<<producto[i].cantidadenStock<<endl;
+            cout<<"codigo: "<<producto[i].codigo<<endl;
+            cout<<"nombre: "<<producto[i].nombre<<endl;
+            cout<<"precio: "<<producto[i].precio<<endl;
+            cout<<"cantidad en stock: "<<producto[i].cantidadenStock<<endl;
         }
         
     }
@@ -90,12 +87,14 @@ Producto producto[n];
 llenarProductos(producto, n);
 
 int codigo;
-cout<<"ingrese el codigo del producto para buscarlo";
+cout<<"ingrese el codigo del producto para buscarlo: ";
 cin>>codigo;
 buscarProducto(producto, n, codigo);
 
-cout<<"valor del inventario"<<endl;
-valorInventario(producto, n);
+cout<<"valor del inventario: "<<valorInventario(producto, n)<<endl;;
 
     return 0;
 }
+
+void col8(){} //firma personal
+//esta hecho en linux asi que no hay ejecutable .exe
