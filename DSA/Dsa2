@@ -1,0 +1,182 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <list>
+#include <algorithm>
+
+// Estructura que representa una zona de exhibición dentro del zoológico.
+// Contiene el nombre de la zona y la cantidad de especies.
+struct Zona
+{
+    std::string nombre;    // Nombre de la zona
+    int cantidad_especies; // Cantidad de especies en esa zona
+};
+
+// Estructura que representa un zoológico completo.
+// Contiene nombre, año de fundación, ubicación y lista de zonas.
+struct Zoologico
+{
+    std::string nombre;      // Nombre del zoológico
+    int anio_fundacion;      // Año en que fue fundado
+    std::string ubicacion;   // País o ciudad donde se encuentra
+    float costo_entrada;     // Costo de entrada al zoologico
+    std::vector<Zona> zonas; // Lista (vector) de zonas de exhibición
+};
+
+// Función que solicita al usuario los datos de un zoológico.
+// Retorna una estructura Zoologico con toda la información ingresada.
+Zoologico SolicitarInformacion()
+{
+    Zoologico zoo;
+
+    std::cout << "Ingrese el nombre del zoologico: ";
+    std::getline(std::cin, zoo.nombre);
+
+    std::cout << "Ingrese el anio de fundacion: ";
+    std::cin >> zoo.anio_fundacion;
+    std::cin.ignore(); // Limpiar el salto de línea pendiente
+
+    std::cout << "Ingrese el precio de entrada: ";
+    std::cin >> zoo.costo_entrada;
+    std::cin.ignore(); // Limpiar el salto de línea pendiente
+
+    std::cout << "Ingrese la ubicacion: ";
+    std::getline(std::cin, zoo.ubicacion);
+
+    int cantidad_zonas; // Preguntar cuantas zonas de exhibicion desea agregar
+    std::cout << "Ingrese cuantas zonas desea agregar: ";
+    std::cin >> cantidad_zonas;
+    std::cin.ignore();
+    /* For que recorre la cantidad de zonas que ingreso el usuario para agregar
+    informacion de cada zona de exhibicion */
+    for (int i = 0; i < cantidad_zonas; i++)
+    {
+        Zona zona;
+        std::cout << "\nZona " << (i + 1) << ":\n";
+
+        std::cout << "Nombre de la zona: "; // Agregar nombre de la zona
+        std::getline(std::cin, zona.nombre);
+
+        std::cout << "Cantidad de especies: "; // Agregar cantidad de especies en exhibicion en esa zona
+        std::cin >> zona.cantidad_especies;
+        std::cin.ignore();
+
+        zoo.zonas.push_back(zona);
+    }
+
+    return zoo;
+}
+
+// Función que imprime toda la información de un zoológico.
+// Recibe la estructura por referencia constante, solo lectura.
+void ImprimirInformacion(const Zoologico &zoo)
+{
+    std::cout << "Nombre de zoologico: " << zoo.nombre << "\n";
+    std::cout << "Anio de fundacion de zoologico: " << zoo.anio_fundacion << "\n";
+    std::cout << "Ubicacion del zoologico: " << zoo.ubicacion << "\n";
+    std::cout << "Costo de entrada al zoologico: " << zoo.costo_entrada << "\n";
+    std::cout << "Zonas de exhibicion: " << "\n";
+
+    for (size_t i = 0; i < zoo.zonas.size(); i++)
+    {
+        std::cout << "  Zona " << (i + 1) << ": " << zoo.zonas[i].nombre << " (" << zoo.zonas[i].cantidad_especies << " especies)\n";
+    }
+}
+
+// Función que ordena una lista de zoológicos por año de fundación.
+void OrdenarPorAnio(std::list<Zoologico> &zoologicos)
+{
+    zoologicos.sort([](const Zoologico &a, const Zoologico &b)
+                    { return a.anio_fundacion < b.anio_fundacion; });
+}
+
+// Usa la función find_if para buscar dentro de la lista.
+// Si lo encuentra, imprime su información y si no, muestra mensaje.
+void BuscarPorNombre(const std::list<Zoologico> &zoologicos)
+{
+    std::string buscado;
+    std::cout << "Ingrese el nombre del zoologico a buscar: ";
+    std::getline(std::cin, buscado);
+
+    // find_if devuelve un iterador al primer elemento que cumple la condición
+    auto it = std::find_if(zoologicos.begin(), zoologicos.end(), [buscado](const Zoologico &z)
+                           { return z.nombre == buscado; });
+
+    if (it != zoologicos.end())
+    {
+        std::cout << "\nZoologico encontrado:\n";
+        ImprimirInformacion(*it); // se imprime toda la información
+    }
+    else
+    {
+        std::cout << "No se encontro ningun zoologico con ese nombre.\n";
+    }
+}
+
+// Función que imprime todos los zoológicos almacenados en la lista.
+void ImprimirTodos(const std::list<Zoologico> &zoologicos) {
+  if (zoologicos.empty()) {
+    std::cout << "No hay zoologicos registrados.\n";
+    return;
+  }
+
+  int contador = 1;
+  for (const auto &z : zoologicos) {
+    std::cout << "\nZoologico " << contador++ << ":\n";
+    ImprimirInformacion(z);
+  }
+}
+
+void MostrarMenu() {
+  std::cout << "MENU:\n";
+  std::cout << "1. Agregar Zoologico\n";
+  std::cout << "2. Ordenar por anio de fundacion\n";
+  std::cout << "3. Mostrar todos los zoologicos\n";
+  std::cout << "4. Buscar zoologico por nombre\n";
+  std::cout << "0. Salir\n";
+  std::cout << "Ingrese una opcion: ";
+}
+
+int main()
+{
+    std::list<Zoologico> zoologicos; // Lista para almacenar varios zoológicos
+      int opcion;
+
+  do {
+    MostrarMenu();
+    std::cin >> opcion;
+    std::cin.ignore();
+
+    switch (opcion) {
+      case 1: {
+        Zoologico nuevo = SolicitarInformacion();
+        zoologicos.push_back(nuevo);
+        std::cout << "Zoologico agregado con exito.\n";
+        break;
+      }
+      case 2: {
+        OrdenarPorAnio(zoologicos);
+        std::cout << "Lista ordenada por anio de fundacion.\n";
+        break;
+      }
+      case 3: {
+        ImprimirTodos(zoologicos);
+        break;
+      }
+      case 4: {
+        BuscarPorNombre(zoologicos);
+        break;
+      }
+      case 0: {
+        std::cout << "Saliendo del programa...\n";
+        break;
+      }
+      default: {
+        std::cout << "Opcion invalida. Intente de nuevo.\n";
+        break;
+      }
+    }
+  } while (opcion != 0);
+
+    return 0;
+}
