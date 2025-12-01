@@ -45,3 +45,30 @@ style: Cambios de formato, tabulaciones, espacios o puntos y coma, etc; no afect
 test: Añade tests o refactoriza uno existente.
 En su defecto tambien puedes usar emojis para indicar el tipo de commit que se esta haciendo, por ejemplo usando la herramienta Gitmoji, donde cada emoji tiene su propia razon de ser es decir, no debemos poner el emoji que mejor nos parezca, si no el que este acorde al commit, puedes revisarlo en la siguiente web.
 */
+
+//solo se permiten estas librerias no usar otras, no usarlas todas solo las necesarias
+#include <iostream>
+#include <queue>
+#include<stack>
+#include <list>
+#include <algorithm>
+#include <string>
+#include <map>
+#include <limits>
+#include <vector>
+#include <set>
+#include <sstream>
+#include<unordered_set>
+#include<unordered_map>
+
+//git status	Te dice en qué rama estás y el estado de tus archivos.
+//git branch	Lista todas las ramas que tienes. La rama actual tiene un asterisco (*).
+//git log --oneline --graph	Muestra el historial de commits de una forma gráfica, útil para ver las ramas.
+//git branch <nombre-de-rama>	Crea una nueva rama, por ejemplo: git branch nueva-funcion.
+//git checkout <nombre-de-rama>	Te mueve a esa rama. Ahora, cualquier cambio que hagas será en esa rama.
+//git checkout -b <nombre-de-rama>	El comando más usado: Crea la rama Y te mueve a ella en un solo paso.
+//git switch <nombre-de-rama>	Alternativa moderna a checkout para solo cambiar de rama (más clara).
+//git switch -c <nombre-de-rama>	Alternativa moderna a checkout -b para crear y cambiar.
+//git merge <nombre-de-rama>	Combina la rama especificada en la rama actual.
+//git branch -d <nombre-de-rama>	Elimina la rama localmente. Solo funciona si la rama ya ha sido fusionada.
+//git branch -D <nombre-de-rama>	Fuerza la eliminación. Úsalo si quieres eliminar la rama antes de fusionarla (ten cuidado, ¡se pierden los cambios!).
