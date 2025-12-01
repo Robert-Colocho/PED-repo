@@ -1,0 +1,283 @@
+#include <iostream>
+#include <string>
+#include <map>
+#include <algorithm>
+#include <vector>
+#include <sstream>
+#include <limits>
+
+using namespace std;
+
+struct Libro
+{
+    string titulo;
+    string autor;
+    int vecesPrestado;
+    int copiasDisponibles;
+    float indicePopularidad;
+};
+
+typedef map<string, Libro> MapaLibros;
+typedef map<string, MapaLibros> MapaBibliotecas;
+
+// 1. Función para solicitar información del libro
+void solicitarInformacionLibro(Libro& libro)
+{
+    cout << "Ingrese el título del libro: ";
+    cin.ignore();
+    getline(cin, libro.titulo);
+    
+    cout << "Ingrese el autor del libro: ";
+    getline(cin, libro.autor);
+    
+    cout << "Ingrese las veces prestado: ";
+    cin >> libro.vecesPrestado;
+    
+    cout << "Ingrese las copias disponibles: ";
+    cin >> libro.copiasDisponibles;
+    
+    libro.indicePopularidad = 0.0f;
+}
+
+// 2. Función para calcular el índice de popularidad
+void calcularIndiceDePopularidad(Libro& libro)
+{
+    libro.indicePopularidad = (float)libro.vecesPrestado / (libro.copiasDisponibles + 1);
+}
+
+// 3. Función para buscar libros por palabra clave
+void buscarLibrosPorPalabraClave(const MapaBibliotecas& bibliotecas, const string& palabraClave)
+{
+    bool encontrado = false;
+    
+    for (const auto& biblioteca : bibliotecas) {
+        for (const auto& libro : biblioteca.second) {
+            if (libro.first.find(palabraClave) != string::npos ||
+                libro.second.autor.find(palabraClave) != string::npos) {
+                cout << "Biblioteca: " << biblioteca.first << endl;
+                cout << "  Título: " << libro.second.titulo << endl;
+                cout << "  Autor: " << libro.second.autor << endl;
+                cout << "  Veces prestado: " << libro.second.vecesPrestado << endl;
+                cout << "  Copias disponibles: " << libro.second.copiasDisponibles << endl;
+                cout << "  Índice de popularidad: " << libro.second.indicePopularidad << endl << endl;
+                encontrado = true;
+            }
+        }
+    }
+    
+    if (!encontrado) {
+        cout << "No se encontraron libros con la palabra clave: " << palabraClave << endl;
+    }
+}
+
+// 4. Función para obtener top 5 libros más populares
+void obtenerTop5LibrosPopulares(const MapaBibliotecas& bibliotecas)
+{
+    vector<pair<Libro, string>> librosConBiblioteca;
+    
+    for (const auto& biblioteca : bibliotecas) {
+        for (const auto& libro : biblioteca.second) {
+            librosConBiblioteca.push_back({libro.second, biblioteca.first});
+        }
+    }
+    
+    sort(librosConBiblioteca.begin(), librosConBiblioteca.end(),
+         [](const pair<Libro, string>& a, const pair<Libro, string>& b) {
+             return a.first.indicePopularidad > b.first.indicePopularidad;
+         });
+    
+    cout << "\n=== TOP 5 LIBROS MÁS POPULARES ===" << endl;
+    int count = 0;
+    for (const auto& item : librosConBiblioteca) {
+        if (count >= 5) break;
+        cout << (count + 1) << ". " << item.first.titulo << " - " << item.first.autor 
+             << " (Popularidad: " << item.first.indicePopularidad << ") [" << item.second << "]" << endl;
+        count++;
+    }
+    if (librosConBiblioteca.empty()) {
+        cout << "No hay libros registrados." << endl;
+    }
+}
+
+// 5. Función para copiar un libro de una biblioteca a otra
+void copiarLibroDeBiblioteca(MapaBibliotecas& bibliotecas, 
+                             const string& biblioOrigen, 
+                             const string& biblioDestino, 
+                             const string& tituloLibro)
+{
+    if (bibliotecas.find(biblioOrigen) == bibliotecas.end()) {
+        cout << "La biblioteca de origen no existe." << endl;
+        return;
+    }
+    
+    if (bibliotecas[biblioOrigen].find(tituloLibro) == bibliotecas[biblioOrigen].end()) {
+        cout << "El libro no existe en la biblioteca de origen." << endl;
+        return;
+    }
+    
+    Libro libro = bibliotecas[biblioOrigen][tituloLibro];
+    bibliotecas[biblioDestino][tituloLibro] = libro;
+    
+    cout << "Libro copiado exitosamente de " << biblioOrigen << " a " << biblioDestino << endl;
+}
+
+// Función auxiliar para mostrar un libro
+void mostrarLibro(const Libro& libro)
+{
+    cout << "  Título: " << libro.titulo << endl;
+    cout << "  Autor: " << libro.autor << endl;
+    cout << "  Veces prestado: " << libro.vecesPrestado << endl;
+    cout << "  Copias disponibles: " << libro.copiasDisponibles << endl;
+    cout << "  Índice de popularidad: " << libro.indicePopularidad << endl;
+}
+
+// Función para mostrar todos los libros de una biblioteca
+void mostrarLibrosDeBiblioteca(const MapaBibliotecas& bibliotecas, const string& nombreBiblioteca)
+{
+    if (bibliotecas.find(nombreBiblioteca) == bibliotecas.end()) {
+        cout << "La biblioteca no existe." << endl;
+        return;
+    }
+    
+    const MapaLibros& libros = bibliotecas.at(nombreBiblioteca);
+    
+    if (libros.empty()) {
+        cout << "La biblioteca está vacía." << endl;
+        return;
+    }
+    
+    cout << "\n=== LIBROS EN " << nombreBiblioteca << " ===" << endl;
+    for (const auto& libro : libros) {
+        cout << "\n" << libro.first << ":" << endl;
+        mostrarLibro(libro.second);
+    }
+}
+
+// Función para agregar un libro a una biblioteca
+void agregarLibroABiblioteca(MapaBibliotecas& bibliotecas, 
+                            const string& nombreBiblioteca, 
+                            const Libro& libro)
+{
+    bibliotecas[nombreBiblioteca][libro.titulo] = libro;
+    cout << "Libro agregado exitosamente a " << nombreBiblioteca << endl;
+}
+
+// Menú principal
+void mostrarMenu()
+{
+    cout << "\n=== MENÚ PRINCIPAL ===" << endl;
+    cout << "1. Solicitar datos de un libro" << endl;
+    cout << "2. Calcular índice de popularidad" << endl;
+    cout << "3. Buscar libros por palabra clave" << endl;
+    cout << "4. Obtener top 5 libros más populares" << endl;
+    cout << "5. Copiar libro entre bibliotecas" << endl;
+    cout << "6. Mostrar libros de una biblioteca" << endl;
+    cout << "7. Salir del programa" << endl;
+    cout << "Seleccione una opción: ";
+}
+
+int main()
+{
+    MapaBibliotecas bibliotecas;
+    int opcion = 0;
+    
+    do {
+        mostrarMenu();
+        cin >> opcion;
+        
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Opción inválida. Intente de nuevo." << endl;
+            continue;
+        }
+        
+        switch (opcion) {
+            case 1: {
+                cout << "Ingrese el nombre de la biblioteca: ";
+                cin.ignore();
+                string nombreBiblioteca;
+                getline(cin, nombreBiblioteca);
+                
+                Libro libro;
+                solicitarInformacionLibro(libro);
+                calcularIndiceDePopularidad(libro);
+                agregarLibroABiblioteca(bibliotecas, nombreBiblioteca, libro);
+                break;
+            }
+            
+            case 2: {
+                cout << "Ingrese el nombre de la biblioteca: ";
+                cin.ignore();
+                string nombreBiblioteca;
+                getline(cin, nombreBiblioteca);
+                
+                cout << "Ingrese el título del libro: ";
+                string titulo;
+                getline(cin, titulo);
+                
+                if (bibliotecas.find(nombreBiblioteca) != bibliotecas.end() &&
+                    bibliotecas[nombreBiblioteca].find(titulo) != bibliotecas[nombreBiblioteca].end()) {
+                    calcularIndiceDePopularidad(bibliotecas[nombreBiblioteca][titulo]);
+                    cout << "Índice de popularidad actualizado: " 
+                         << bibliotecas[nombreBiblioteca][titulo].indicePopularidad << endl;
+                } else {
+                    cout << "Libro no encontrado." << endl;
+                }
+                break;
+            }
+            
+            case 3: {
+                cout << "Ingrese la palabra clave a buscar: ";
+                cin.ignore();
+                string palabraClave;
+                getline(cin, palabraClave);
+                buscarLibrosPorPalabraClave(bibliotecas, palabraClave);
+                break;
+            }
+            
+            case 4: {
+                obtenerTop5LibrosPopulares(bibliotecas);
+                break;
+            }
+            
+            case 5: {
+                cout << "Ingrese el nombre de la biblioteca origen: ";
+                cin.ignore();
+                string biblioOrigen;
+                getline(cin, biblioOrigen);
+                
+                cout << "Ingrese el nombre de la biblioteca destino: ";
+                string biblioDestino;
+                getline(cin, biblioDestino);
+                
+                cout << "Ingrese el título del libro a copiar: ";
+                string titulo;
+                getline(cin, titulo);
+                
+                copiarLibroDeBiblioteca(bibliotecas, biblioOrigen, biblioDestino, titulo);
+                break;
+            }
+            
+            case 6: {
+                cout << "Ingrese el nombre de la biblioteca: ";
+                cin.ignore();
+                string nombreBiblioteca;
+                getline(cin, nombreBiblioteca);
+                mostrarLibrosDeBiblioteca(bibliotecas, nombreBiblioteca);
+                break;
+            }
+            
+            case 7: {
+                cout << "¡Hasta luego!" << endl;
+                break;
+            }
+            
+            default:
+                cout << "Opción inválida. Intente de nuevo." << endl;
+        }
+        
+    } while (opcion != 7);
+    
+    return 0;
+}
